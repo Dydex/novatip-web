@@ -14,13 +14,15 @@
  *   - A backend fault is rethrown for the error boundary instead
  *   - A leading @ is stripped before the lookup
  *   - Metadata reflects the creator, or the failure
+ *   - normalizeSlug: bare slug, @ prefix, percent-encoded @, and an @ that
+ *     isn't a prefix are each handled correctly
  */
 
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 import { ApiError } from "@/lib/api";
 import CreatorNotFound from "./not-found";
-import TipPage, { generateMetadata } from "./page";
+import TipPage, { generateMetadata, normalizeSlug } from "./page";
 
 vi.mock("@/components/Header", () => ({
   Header: () => <header data-testid="header" />,
@@ -135,6 +137,26 @@ describe("app/[slug]/page – choosing a boundary", () => {
     await TipPage({ params: Promise.resolve({ slug: "%40alice" }) });
 
     expect(resolve).toHaveBeenCalledWith("alice");
+  });
+});
+
+// ── normalizeSlug ─────────────────────────────────────────────────────────────
+
+describe("normalizeSlug", () => {
+  it("leaves a bare slug unchanged", () => {
+    expect(normalizeSlug("alice")).toBe("alice");
+  });
+
+  it("strips a leading @", () => {
+    expect(normalizeSlug("@alice")).toBe("alice");
+  });
+
+  it("decodes a percent-encoded @ and then strips it", () => {
+    expect(normalizeSlug("%40alice")).toBe("alice");
+  });
+
+  it("does not touch an @ that is not a prefix", () => {
+    expect(normalizeSlug("ali@ce")).toBe("ali@ce");
   });
 });
 
