@@ -25,7 +25,7 @@ interface Props {
 }
 
 // Strip leading @ if the user typed /@alice in the URL
-function normalizeSlug(slug: string): string {
+export function normalizeSlug(slug: string): string {
   return decodeURIComponent(slug).replace(/^@/, "");
 }
 

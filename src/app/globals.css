@@ -65,7 +65,16 @@
   }
 
   html {
-    @apply antialiased scroll-smooth;
+    /*
+     * Both headers (Header.tsx, dashboard/layout.tsx) are `sticky top-0` at
+     * h-16 (4rem). Without scroll-pt-16, scrolling a focused element or an
+     * in-page anchor into view lands it flush with the top of the viewport,
+     * right under the header — focused but invisible. scroll-padding-top
+     * reserves that space for every such scroll-into-view, keyboard or
+     * anchor alike, without touching ordinary mouse/wheel scrolling, which
+     * it never applies to.
+     */
+    @apply antialiased scroll-smooth scroll-pt-16;
   }
 
   body {
